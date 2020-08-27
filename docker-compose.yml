@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  php:
+    # Uncomment the next line to use a non-root user for all processes.
+    # See https://aka.ms/vscode-remote/containers/non-root for details.
+    # user: vscode
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Update VARIANT to pick a PHP version: 7, 7.4, 7.3
+        VARIANT: "7"
+        INSTALL_NODE: "true"
+        NODE_VERSION: "lts/*"
+        # On Linux, you may need to update USER_UID and USER_GID below if not your local UID is not 1000.
+        USER_UID: 1000
+        USER_GID: 1000
+
+    volumes:
+      - ..:/workspace:cached
+
+    # Use "ports" to publish your web port locally. Consider "forwardPorts" in
+    # devcontainer.json instead if your app only allows connections from localhost.
+    # ports:
+    #   - 8080:8080
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    links:
+      - mariadb
+
+  # Note: The MariaDB host name is "db", not "localhost"
+  mariadb:
+      image: mariadb:10.4
+      restart: unless-stopped
+      environment:
+          MYSQL_ROOT_PASSWORD: just-for-testing
+          MYSQL_DATABASE: mariadb
+
+      # Uncomment to allow access to mariadb from external tools
+      # ports:
+      #   - "3306:3306"
